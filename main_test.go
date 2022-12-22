@@ -2,6 +2,8 @@ package benchmark
 
 import (
 	capnp "capnproto.org/go/capnp/v3"
+	"fmt"
+	"runtime"
 	"sync"
 	"testing"
 )
@@ -49,97 +51,16 @@ func loop(n int, book *Book, wg *sync.WaitGroup) {
 	wg.Done()
 }
 
-func spinGoroutines(ngos int, b *testing.B) {
-	book := CreateBook()
-	var wg sync.WaitGroup
-	wg.Add(ngos)
-	for i := 0; i < ngos; i++ {
-		go loop(b.N, &book, &wg)
+func BenchmarkAll(b *testing.B) {
+	for numcpu := 1; numcpu <= runtime.NumCPU(); numcpu++ {
+		b.Run(fmt.Sprintf("%d concurrency", numcpu), func(b *testing.B) {
+			book := CreateBook()
+			var wg sync.WaitGroup
+			wg.Add(numcpu)
+			for i := 0; i < numcpu; i++ {
+				go loop(b.N, &book, &wg)
+			}
+			wg.Wait()
+		})
 	}
-	wg.Wait()
-}
-
-func BenchmarkOne(b *testing.B) {
-	spinGoroutines(1, b)
-}
-func BenchmarkTwo(b *testing.B) {
-	spinGoroutines(2, b)
-}
-func BenchmarkThree(b *testing.B) {
-	spinGoroutines(3, b)
-}
-func BenchmarkFour(b *testing.B) {
-	spinGoroutines(4, b)
-}
-func BenchmarkFive(b *testing.B) {
-	spinGoroutines(5, b)
-}
-func BenchmarkSix(b *testing.B) {
-	spinGoroutines(6, b)
-}
-func BenchmarkSeven(b *testing.B) {
-	spinGoroutines(7, b)
-}
-func BenchmarkEight(b *testing.B) {
-	spinGoroutines(8, b)
-}
-func BenchmarkNine(b *testing.B) {
-	spinGoroutines(9, b)
-}
-func BenchmarkTen(b *testing.B) {
-	spinGoroutines(10, b)
-}
-func BenchmarkEleven(b *testing.B) {
-	spinGoroutines(11, b)
-}
-func BenchmarkTwelve(b *testing.B) {
-	spinGoroutines(12, b)
-}
-func BenchmarkThirteen(b *testing.B) {
-	spinGoroutines(13, b)
-}
-func BenchmarkFourteen(b *testing.B) {
-	spinGoroutines(14, b)
-}
-func BenchmarkFifteen(b *testing.B) {
-	spinGoroutines(15, b)
-}
-func BenchmarkSixteen(b *testing.B) {
-	spinGoroutines(16, b)
-}
-func BenchmarkSeventeen(b *testing.B) {
-	spinGoroutines(17, b)
-}
-func BenchmarkEighteen(b *testing.B) {
-	spinGoroutines(18, b)
-}
-func BenchmarkNineteen(b *testing.B) {
-	spinGoroutines(19, b)
-}
-func BenchmarkTwenty(b *testing.B) {
-	spinGoroutines(20, b)
-}
-func BenchmarkTwentyOne(b *testing.B) {
-	spinGoroutines(21, b)
-}
-func BenchmarkTwentyTwo(b *testing.B) {
-	spinGoroutines(22, b)
-}
-func BenchmarkTwentyThree(b *testing.B) {
-	spinGoroutines(23, b)
-}
-func BenchmarkTwentyFour(b *testing.B) {
-	spinGoroutines(24, b)
-}
-func BenchmarkTwentyFive(b *testing.B) {
-	spinGoroutines(25, b)
-}
-func BenchmarkTwentySix(b *testing.B) {
-	spinGoroutines(26, b)
-}
-func BenchmarkTwentySeven(b *testing.B) {
-	spinGoroutines(27, b)
-}
-func BenchmarkTwentyEight(b *testing.B) {
-	spinGoroutines(28, b)
 }
