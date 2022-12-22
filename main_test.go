@@ -17,10 +17,11 @@ func CreateBook() Book {
 	// message, which is needed to instantiate the Book struct.  You don't need to
 	// understand segments and roots yet (or maybe ever), but if you're curious, messages
 	// and segments are documented here:  https://capnproto.org/encoding.html
-	_, seg, err := capnp.NewMessage(arena)
+	msg, seg, err := capnp.NewMessage(arena)
 	if err != nil {
 		panic(err)
 	}
+	msg.ResetReadLimit(1 << 63)
 
 	// Create a new Book struct.  Every message must have a root struct.  Again, it is
 	// not important to understand "root structs" at this point.  For now, just understand
@@ -40,7 +41,10 @@ func CreateBook() Book {
 }
 
 func onerun(b *Book) bool {
-	bytes, _ := b.TitleBytes()
+	bytes, err := b.TitleBytes()
+	if err != nil {
+		panic(err)
+	}
 	return 100 < len(bytes)
 }
 
