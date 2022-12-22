@@ -64,3 +64,23 @@ func BenchmarkAll(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkAllFast(b *testing.B) {
+	for numcpu := 1; numcpu <= runtime.NumCPU(); numcpu++ {
+		b.Run(fmt.Sprintf("%d concurrency", numcpu), func(b *testing.B) {
+			book := CreateBook()
+			msg1 := book.Message()
+			var wg sync.WaitGroup
+			wg.Add(numcpu)
+			for i := 0; i < numcpu; i++ {
+				msg2 := &capnp.Message{Arena: msg1.Arena, CapTable: msg1.CapTable}
+				book2, err := ReadRootBook(msg2)
+				if err != nil {
+					panic("Failed!")
+				}
+				go loop(b.N, &book2, &wg)
+			}
+			wg.Wait()
+		})
+	}
+}
